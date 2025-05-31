@@ -1,0 +1,165 @@
+#include <stdio.h>
+#include <string.h>
+#define MAX_STUDENTS 100
+#define SUBJECT "C_Programming"
+#define FILENAME "attendance.txt"
+#define PASSWORD "pass@123"
+typedef struct 
+    {
+    char roll_no[20];
+    char name[50];
+    int total_classes;
+    int present_count;
+}
+Student;
+Student students[MAX_STUDENTS];
+int student_count = 0;
+void addStudent()
+{
+    printf("Enter number of students to add: ");
+    scanf("%d", &student_count);
+
+    for (int i = 0; i < student_count; i++)
+    {
+        printf("Enter Roll No: ");
+        scanf("%s", students[i].roll_no);
+        printf("Enter Name: ");
+        scanf(" %[^\n]", students[i].name);
+        students[i].total_classes = 0;
+        students[i].present_count = 0;
+    }
+
+    printf("✅ Students added successfully.\n");
+    printf("THANK YOU\n");
+}
+
+void markAttendance()
+{
+    FILE *file = fopen(FILENAME, "a");
+    if (!file) 
+    {
+        printf("Error opening file.\n");
+        return;
+    }
+
+    printf("Marking attendance for subject: %s\n", SUBJECT);
+    for (int i = 0; i < student_count; i++)
+    {
+        char status;
+        printf("Is %s (%s) present? (P/A): ", students[i].name, students[i].roll_no);
+        scanf(" %c", &status);
+
+        students[i].total_classes++;
+        if (status == 'P' || status == 'p') 
+        {
+            students[i].present_count++;
+        }
+
+        printf(file, "%s,%s,%d,%d\n", students[i].roll_no, students[i].name, 
+                students[i].total_classes, students[i].present_count);
+    }
+
+    close(file);
+    printf("✅ Attendance marked successfully.\n");
+}
+
+void attendanceReport() {
+    printf("\n____ Attendance Report ____\n");
+    printf("%-10s %-20s %-10s %-10s %-10s\n", "Roll No", "Name", "Present", "Total", "Percent");
+
+    for (int i = 0; i < student_count; i++) {
+        float percent = 0.0;
+        if (students[i].total_classes > 0)
+            percent = (students[i].present_count * 100.0f) / students[i].total_classes;
+
+        printf("%-10s %-20s %-10d %-10d %-10.2f%%\n",
+               students[i].roll_no, students[i].name, students[i].present_count,
+               students[i].total_classes, percent);
+    }
+}
+void defaulterList() 
+{
+    printf("\n_______ Defaulter List (<75%%) _______\n");
+    printf("%-10s %-20s %-10s\n", "Roll No","Name","Percent");
+
+    for (int i = 0; i < student_count; i++)
+    {
+        float percent = 0.0;
+        if (students[i].total_classes > 0)
+            percent = (students[i].present_count * 100.0f) / students[i].total_classes;
+
+        if (percent < 75.0f) 
+        {
+            printf("%-10s %-20s %-10.2f%%\n", students[i].roll_no, students[i].name, percent);
+        }
+    }
+}
+
+int login() 
+{
+    char pass[20];
+    printf("Please enter teacher password: ");
+    scanf("%s", pass);
+    if (strcmp(pass, PASSWORD) == 0) {
+        return 1;
+    } else {
+        printf("❌ Incorrect password. Please try again.\n");
+        return 0;
+    }
+}
+void Forgatepassword() 
+{
+    printf("🔐Reset password is not implemented yet.\n");
+}
+int main() {
+    int choice;
+
+    printf("_\n");
+    printf("\n");
+    printf("WELCOME TO ATTENDANCE MANAGEMENT SYSTEM\n");
+    printf("_\n");
+    printf("\n");
+
+    if (!login()) 
+    {
+        return 0;
+    }
+    do 
+    {
+        printf("\n__MENU\n");
+        printf("1. Add Students\n");
+        printf("2. Mark Attendance\n");
+        printf("3. Attendance Report\n");
+        printf("4. Defaulter List\n");
+        printf("5. Forgot Password\n");
+        printf("6. Exit\n");
+        printf("Enter choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                addStudent();
+                break;
+            case 2:
+                markAttendance();
+                break;
+            case 3:
+                attendanceReport();
+                break;
+            case 4:
+                defaulterList();
+                break;
+            case 5:
+                Forgatepassword();
+                break;
+            case 6:
+                printf("Exiting system.\n");
+                printf("_____ Thank You ____\n");
+                break;
+            default:
+                printf("❌ Invalid choice.\n");
+        }
+    } while (choice != 6);
+
+    return 0;
+}
